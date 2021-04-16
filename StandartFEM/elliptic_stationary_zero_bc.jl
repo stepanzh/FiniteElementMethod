@@ -110,15 +110,16 @@ function stiffness_matrix(S::AbstractVector{Subinterval{T}}) where {T}
 
     central[1] =   1 / len(S[1]) + 1 / len(S[2])
       upper[1] = - 1 / len(S[2])
-    central[M] =   1 / len(S[M]) + 1 / len(S[M+1])
+    
     lower[M-1] = - 1 / len(S[M])
+    central[M] =   1 / len(S[M]) + 1 / len(S[M+1])
 
     @inbounds for i in 2:length(central)-1
-          hᵢ = len(S[i])
-        hᵢ₊₁ = len(S[i+1])
-        lower[i-1] = - 1 / hᵢ
-        central[i] = (1 / hᵢ) + (1 / hᵢ₊₁)
-        upper[i] = - 1 / hᵢ₊₁
+          hᵢ⁻¹ = 1 / len(S[i])
+        hᵢ₊₁⁻¹ = 1 / len(S[i+1])
+        lower[i-1] = - hᵢ⁻¹
+        central[i] = hᵢ⁻¹ + hᵢ₊₁⁻¹
+          upper[i] = - hᵢ₊₁⁻¹
     end
     return Tridiagonal(lower, central, upper)
 end
