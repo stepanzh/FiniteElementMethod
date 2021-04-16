@@ -109,7 +109,7 @@ function stiffness_matrix(S::AbstractVector{Subinterval{T}}) where {T}
     A[1, 1] = 1 / len(S[1]) + 1 / len(S[2])
     A[1, 2] = - 1 / len(S[2])
     
-    A[M, M-1] = - 1 / len(S[M-1])
+    A[M, M-1] = - 1 / len(S[M])
     A[M, M] = 1 / len(S[M]) + 1 / len(S[M+1])
 
     @inbounds for i in 2:size(A)[1]-1
@@ -191,7 +191,7 @@ Cf = 1
 
 # Partition of [0, 1]. xᵢ points i=0, 1, ..., M+1
 "xᵢ points i = 0, 1, ..., M+1"
-mesh = generate_mesh(M=199, type="linear")
+mesh = generate_mesh(M=199, type="random")
 
 "Vector of subintervals Iᵢ."
 intervals = let mesh=mesh
