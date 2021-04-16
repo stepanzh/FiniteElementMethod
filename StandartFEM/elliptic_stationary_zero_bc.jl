@@ -73,7 +73,7 @@ struct Hat{T<:Real}
     x₀::T
     x₊::T
 end
-fvalue(f::Hat{T}, x::Real) where {T} = begin
+function (f::Hat{T})(x::Real) where {T}
     if x == f.x₀  # is ok to use `==` here (?)
         return one(T)
     elseif f.x₋ < x < f.x₀
@@ -85,7 +85,6 @@ fvalue(f::Hat{T}, x::Real) where {T} = begin
     else
         return zero(T)
     end
-    return nothing  # for errors
 end
 
 "υ(x) = ∑υᵢφᵢ(x)"
@@ -96,7 +95,7 @@ end
 fvalue(f::FEMRepresentation{T}, x::Real) where {T} = begin
     val = zero(T)
     for (φᵢ, υᵢ) in zip(f.φ, f.υ)
-        val += fvalue(φᵢ, x) * υᵢ
+        val += υᵢ * φᵢ(x)
     end
     return val
 end
@@ -191,7 +190,7 @@ Cf = 1
 
 # Partition of [0, 1]. xᵢ points i=0, 1, ..., M+1
 "xᵢ points i = 0, 1, ..., M+1"
-mesh = generate_mesh(M=199, type="random")
+mesh = generate_mesh(M=199, type="linear")
 
 "Vector of subintervals Iᵢ."
 intervals = let mesh=mesh
