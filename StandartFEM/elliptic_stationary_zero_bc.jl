@@ -57,6 +57,7 @@ Values pᵢ are found from the following system
    F - Mx1 'source' vector of (f, φᵢ)
 =#
 
+using LinearAlgebra: Tridiagonal
 
 "Subinterval Iᵢ."
 struct Subinterval{T<:Real}
@@ -103,22 +104,24 @@ end
 "Stiffness matrix for hat basis functions φᵢ."
 function stiffness_matrix(S::AbstractVector{Subinterval{T}}) where {T}
     M = length(S) - 1
-    A = zeros((M, M))
-    
-    A[1, 1] = 1 / len(S[1]) + 1 / len(S[2])
-    A[1, 2] = - 1 / len(S[2])
-    
-    A[M, M-1] = - 1 / len(S[M])
-    A[M, M] = 1 / len(S[M]) + 1 / len(S[M+1])
+    lower = Vector{T}(undef, M-1)
+    upper = similar(lower)
+    central = Vector{T}(undef, M)
 
-    @inbounds for i in 2:size(A)[1]-1
-          hᵢ = len(S[i])
-        hᵢ₊₁ = len(S[i+1])
-        A[i, i-1] = - 1 / hᵢ
-        A[i, i] = (1 / hᵢ) + (1 / hᵢ₊₁)
-        A[i, i+1] = - 1 / hᵢ₊₁
+    central[1] =   1 / len(S[1]) + 1 / len(S[2])
+      upper[1] = - 1 / len(S[2])
+    
+    lower[M-1] = - 1 / len(S[M])
+    central[M] =   1 / len(S[M]) + 1 / len(S[M+1])
+
+    @inbounds for i in 2:length(central)-1
+          hᵢ⁻¹ = 1 / len(S[i])
+        hᵢ₊₁⁻¹ = 1 / len(S[i+1])
+        lower[i-1] = - hᵢ⁻¹
+        central[i] = hᵢ⁻¹ + hᵢ₊₁⁻¹
+          upper[i] = - hᵢ₊₁⁻¹
     end
-    return A
+    return Tridiagonal(lower, central, upper)
 end
 
 "Source vector Fⱼ = (f(x), φⱼ), j = 1, ..., M."
