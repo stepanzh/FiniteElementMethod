@@ -92,7 +92,7 @@ struct FEMRepresentation{T}
     φ::Vector{Hat{T}}
     υ::Vector{T}
 end
-fvalue(f::FEMRepresentation{T}, x::Real) where {T} = begin
+function (f::FEMRepresentation{T})(x::Real) where {T}
     val = zero(T)
     for (φᵢ, υᵢ) in zip(f.φ, f.υ)
         val += υᵢ * φᵢ(x)
@@ -158,7 +158,7 @@ function dump(;
     )
     println(io, "# x\tp_h(x)\tp_true(x)\tΔP")
     for x in xpoints
-        P_fem = fvalue(solution_fem, x)
+        P_fem = solution_fem(x)
         P_true = solution_true(x)
         ΔP = abs(P_true - P_fem)
         println(io, join([x, P_fem, P_true, ΔP], '\t'))
