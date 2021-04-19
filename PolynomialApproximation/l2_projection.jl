@@ -9,6 +9,7 @@ Reference
 =#
 
 using DelimitedFiles
+using LinearAlgebra: Tridiagonal
 
 
 "Hat basis function φⱼ."
@@ -46,16 +47,23 @@ end
 
 "Mass matrix (including boundaries) from mesh `x` and hat basis."
 function mass_assemlber(x::AbstractVector{T}) where {T}
-    n = length(x) - 1  # number of subintervals
-    M = zeros(T, (n+1, n+1))
-    @inbounds for i in 1:n  # loop over subintervals
+    "number of subintervals"
+    n = length(x) - 1
+
+    lower = Vector{T}(undef, n)
+    upper = similar(lower)
+    for i in eachindex(lower)
         h = x[i+1] - x[i]
-        M[i, i] += h / 3
-        M[i, i+1] += h / 6
-        M[i+1, i] += h / 6
-        M[i+1, i+1] += h / 3
+        lower[i] = upper[i] = h / 6
     end
-    return M
+
+    central = zeros(T, n+1)
+    @inbounds for i in 1:n
+        h = x[i+1] - x[i]
+        central[i] += h / 3
+        central[i+1] += h / 3
+    end
+    return Tridiagonal(lower, central, upper)
 end
 
 "Trapezoidal quadrature is used."
