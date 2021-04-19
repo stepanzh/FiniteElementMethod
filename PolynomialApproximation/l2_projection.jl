@@ -123,11 +123,9 @@ function error_asymptotic(; target_function::Function, domain=(0, 1), io=stdout)
     end
     
     target_discrete = map(target_function, mesh_error)
-    for n in (11)#, 51, 101, 201, 401, 601, 801, 1001, 1201)
+    for n in (11, 51, 101, 201, 401, 601, 801, 1001, 1201)
         solution = l2_projection(mesh_size=n, target_function=target_function, domain=domain)
         fem_discrete = map(solution, mesh_error)
-        println(fem_discrete)
-        println(target_discrete)
         Δ = maximum(abs.(target_discrete .- fem_discrete))
         println(join([n, Δ], '\t'))
     end
