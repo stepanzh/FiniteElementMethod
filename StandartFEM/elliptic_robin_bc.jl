@@ -61,7 +61,6 @@ function stiffness_assembler(x, conductivity, κ∂Ω)
         h = x[i+1] - x[i]
         xmid = (x[i+1] + x[i]) / 2
         amid = conductivity(xmid)
-
         A[i, i] += amid / h
         A[i, i+1] -= amid / h
         A[i+1, i] -= amid / h
@@ -85,6 +84,7 @@ function source_assembler(x, heatsource, κ∂Ω, g∂Ω)
     return b
 end
 
+"Returns Vector{Hat{T}} of hat-basis functions including half-hats."
 function basis_assembler(x::AbstractVector{T}) where {T}
     φ = Vector{Hat{T}}(undef, length(x))
     φ[1] = Hat(NaN, x[1], x[2])  # half-hat
@@ -148,7 +148,7 @@ solution_fem = solver(
 )
 dump(
     io=stdout,
-    mesh_points=100,
+    mesh_points=50,
     Ω=Ω,
     solution=solution_fem
 )
