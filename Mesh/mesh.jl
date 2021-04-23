@@ -1,3 +1,13 @@
+#=
+Reference 
+    Mats G. Larson, Fredrik Bengzon.
+    The Finite Element Method: Theory, Implementation, and Applications.
+    Springer, 2013.
+    ISBN 978-3-642-33286-9
+    
+    Chapter 3.1
+=#
+
 "Stores point, connectivity matrices and satellite data."
 struct Triangulation{F,I}
     P::Matrix{F}
