@@ -112,8 +112,33 @@ function mass_assembler_2d(mesh::Triangulation{F,I}) where {F, I}
     return M
 end
 
-mesh = TriangulationOfRect([0, 0], [2, 2], [2, 2])
+"""
+Returns load vector for 2d hat-functions basis and function `f`.
+Uses node quadrature rule.
+"""
+function load_assembler_2d(mesh::Triangulation{F,I}, f::Function) where {F,I}
+    b = zeros(F, number_points(mesh))
+    for K in 1:number_elements(mesh)
+        loc2glb = connectivity_matrix(mesh)[1:3, K]
+        K_area = area(mesh, K)
+        N = element_vertexes(mesh, K)
+        bK = 1/3 .* map(f, N) .* K_area  # node-quadrature
+        b[loc2glb] += bK
+    end
+    return b
+end
+
+
+target_function(x) = x[1]^2 + x[2]^2
+
+mesh = TriangulationOfRect([-1, -1], [1, 1], [10, 10])
 M = mass_assembler_2d(mesh)
-# for row in eachrow(M)
-#     println(row)
-# end
+b = load_assembler_2d(mesh, target_function)
+ξ = M \ b
+
+for i in eachindex(ξ)
+    Nᵢ = point_matrix(mesh)[:, i]
+    πf = ξ[i]
+    f = target_function(Nᵢ)
+    println(join([Nᵢ..., f, πf, f - πf], '\t'))
+end
