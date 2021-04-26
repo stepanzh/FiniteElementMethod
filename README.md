@@ -15,9 +15,13 @@ ISBN 0-89871-606-3
 
 # Polynomial Approximation
 ## L2-projection
+### One-dimensional
 - ![Script](PolynomialApproximation/l2_projection.jl).
 - ![Plot of projection](PolynomialApproximation/plots/l2_projection.pdf).
 - ![Plot of error](PolynomialApproximation/plots/l2_projection_error.pdf)
+
+### Two-dimensional
+- ![Script](PolynomialApproximation/l2_projection_2d.jl).
 
 # Standard FEM
 
