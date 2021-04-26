@@ -23,11 +23,17 @@ connectivity_matrix(x::Triangulation) = x.T
 number_points(x::Triangulation) = size(point_matrix(x), 2)
 number_elements(x::Triangulation) = size(connectivity_matrix(x), 2)
 
+"Returns coordinates of vertexes of element `K`."
+function element_vertexes(mesh::Triangulation, K::Int)
+    N = connectivity_matrix(mesh)[:, K]
+    vertexes = [point_matrix(mesh)[:, K] for K in N]
+    return vertexes
+end
+
 "Returns area of triangle `K`."
 function area(mesh::Triangulation, K::Int)
     "Vertex indices."
-    N = connectivity_matrix(mesh)[1:3, K]
-    vertexes = [point_matrix(mesh)[1:2, K] for K in N]
+    vertexes = element_vertexes(mesh, K)
     AB = vertexes[1] - vertexes[2]
     BC = vertexes[2] - vertexes[3]
     S = 0.5 * abs(AB[1] * BC[2] - AB[2]*BC[1])  # cross product in 2D used
